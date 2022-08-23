@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <div id="app"></div>
+        <div id="count"></div>
+
+        <script src="../node_modules/@hw-vue/reactivity/dist/reactivity.global.js"></script>
+
+        <script>
+            const { reactive, effect, ref } = VueReactivity;
+
+            const user = reactive({
+                name: 'wang',
+                parent: {
+                    mother: 'liu',
+                    father: 'wang',
+                },
+            });
+
+            const app = document.getElementById('app');
+            effect(() => {
+                app.innerText = user.name;
+            });
+
+            const count = ref(0);
+            effect(() => {
+                document.getElementById('count').innerText = count.value;
+            });
+
+            setInterval(() => {
+                user.name = 'wang' + Date.now();
+                count.value++;
+            }, 1000);
+        </script>
+    </body>
+</html>

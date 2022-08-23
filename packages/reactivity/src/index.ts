@@ -1,5 +1,3 @@
-import shared from '@hw-vue/shared';
-
-const reactivity = {};
-
-export default { reactivity };
+export * from './reactive';
+export * from './effect';
+export * from './ref';
