@@ -62,7 +62,7 @@ export function track(target: any, operator: TrackOpTypes, key: any) {
     if (!dep.has(activeEffect)) dep.add(activeEffect);
 }
 
-export function trigger(target: any, operator: TriggerOpTypes, key: any, val: any, oldVal?: any) {
+export function trigger(target: any, operator: TriggerOpTypes, key: any, val?: any, oldVal?: any) {
     // 判断属性是否被收集
     const depsMap = targetMap.get(target);
     if (!depsMap) return;
@@ -96,5 +96,11 @@ export function trigger(target: any, operator: TriggerOpTypes, key: any, val: an
         }
     }
 
-    effects.forEach((effect) => effect());
+    effects.forEach((effect: any) => {
+        if (effect.options.scheduler) {
+            effect.options.scheduler();
+        } else {
+            effect();
+        }
+    });
 }

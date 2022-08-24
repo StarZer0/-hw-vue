@@ -13,7 +13,7 @@
         <script src="../node_modules/@hw-vue/reactivity/dist/reactivity.global.js"></script>
 
         <script>
-            const { reactive, effect, ref } = VueReactivity;
+            const { reactive, effect, ref, computed } = VueReactivity;
 
             const user = reactive({
                 name: 'wang',
@@ -33,10 +33,20 @@
                 document.getElementById('count').innerText = count.value;
             });
 
-            setInterval(() => {
+            setTimeout(() => {
                 user.name = 'wang' + Date.now();
                 count.value++;
             }, 1000);
+
+            const number = computed(() => {
+                console.log('runner');
+                return count.value;
+            });
+
+            setTimeout(() => {
+                console.log('get computed value');
+                console.log(number.value);
+            }, 2000);
         </script>
     </body>
 </html>
