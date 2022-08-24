@@ -7,3 +7,5 @@ export const isString = (val) => typeof val === 'string';
 export const isIntegerKey = (val) => parseInt(val) + '' === val;
 export const hasOwn = (target, key) => Object.prototype.hasOwnProperty.call(target, key);
 export const isEqual = (left, right) => left === right;
+
+export * from './shapeFlags';

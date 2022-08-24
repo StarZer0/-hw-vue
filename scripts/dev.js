@@ -2,7 +2,7 @@
 const execa = require('execa')
 
 // TODO: 根据参数解析相应模块
-const target = 'reactivity';
+const target = 'runtime-dom';
 
 build(target)
 
