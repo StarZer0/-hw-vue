@@ -9,7 +9,7 @@ export function createAppApi(render) {
             mount(container) {
                 // 1. 创建虚拟节点
                 const vnode = createVNode(rootComponent, rootProps);
-                console.log(vnode);
+
                 // 2. 调用render方法进行渲染
                 render(vnode, container);
 

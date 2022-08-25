@@ -7,6 +7,38 @@
         <title>Document</title>
     </head>
     <body>
-        <script src="../node_modules/@hw-vue/runtime-core/dist/VueRuntimeCore.global.js"></script>
+        <div id="app"></div>
+        <script src="../node_modules//@hw-vue/reactivity/dist/reactivity.global.js"></script>
+        <script src="../node_modules/@hw-vue/runtime-dom/dist/runtime-dom.global.js"></script>
+        <script>
+            const { createApp, h, reactive, effect } = VueRuntimeDom;
+            const App = {
+                setup() {
+                    const user = reactive({
+                        nickname: 'Li',
+                        age: 22,
+                        sex: 0,
+                    });
+
+                    setTimeout(() => {
+                        user.name = 'wang';
+                    }, 3000);
+
+                    effect(() => {
+                        console.log(user.sex);
+                    });
+
+                    const onClick = () => {
+                        user.nickname = 'wang';
+                        console.log('click trigger');
+                    };
+
+                    return () => {
+                        return h('div', { onClick }, user.nickname);
+                    };
+                },
+            };
+            createApp(App, { key: 'a3ebf2' }).mount('#app');
+        </script>
     </body>
 </html>

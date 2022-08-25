@@ -1,4 +1,6 @@
 // runtime-dom 核心就是提供DOM API方法
+export * from '@hw-vue/runtime-core';
+export * from '@hw-vue/reactivity';
 
 import { createRenderer } from '@hw-vue/runtime-core';
 import { extend } from '@hw-vue/shared';
@@ -17,7 +19,7 @@ export function createApp(rootComponent, rootProps = null) {
         el.innerHTML = '';
 
         // 组件渲染成DOM并挂载
-        mount(container);
+        mount(el);
     };
 
     return app;

@@ -5,9 +5,10 @@ export function pathEvent(el, key, value) {
     // 函数缓存
     const invokers = el._vei || (el._vei = {});
 
-    const eventName = key.slice(2).toLowerCae();
-    const exist = invokers[eventName];
+    console.log('asd', key);
 
+    const eventName = key.slice(2).toLowerCase();
+    const exist = invokers[eventName];
     if (value && exist) {
         exist.value = value;
     } else {
