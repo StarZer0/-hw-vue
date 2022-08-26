@@ -2,6 +2,7 @@ import { effect } from '@hw-vue/reactivity';
 import { ShapeFlags } from '@hw-vue/shared';
 import { createAppApi } from './apiCreateApp';
 import { createComponentInstance, setupComponent } from './component';
+import { queueJob } from './queueJob';
 import { normalizeVNode, TEXT } from './vnode';
 
 // 创建渲染器
@@ -11,18 +12,23 @@ export function createRenderer(rendererOptions) {
     // 创建render effect函数
     const setupRenderEffect = (instance, container) => {
         // 创建effect 并调用render方法
-        effect(function componentEffect() {
-            console.log('render gegnx');
-            if (!instance.isMounted) {
-                const subTree = (instance.subTree = instance.render.call(instance.proxy, instance.proxy));
-                console.log(subTree);
-                patch(null, subTree, container);
-                instance.isMounted = true;
-            } else {
-                // 更新
-                console.log('更新');
+        instance.update = effect(
+            function componentEffect() {
+                console.log('render gegnx');
+                if (!instance.isMounted) {
+                    const subTree = (instance.subTree = instance.render.call(instance.proxy, instance.proxy));
+                    console.log(subTree);
+                    patch(null, subTree, container);
+                    instance.isMounted = true;
+                } else {
+                    // 更新
+                    console.log('更新');
+                }
+            },
+            {
+                scheduler: queueJob,
             }
-        });
+        );
     };
 
     function processText(n1, n2, container) {

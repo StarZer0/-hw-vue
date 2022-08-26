@@ -98,7 +98,7 @@ export function trigger(target: any, operator: TriggerOpTypes, key: any, val?: a
 
     effects.forEach((effect: any) => {
         if (effect.options.scheduler) {
-            effect.options.scheduler();
+            effect.options.scheduler(effect);
         } else {
             effect();
         }
