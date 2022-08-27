@@ -3,7 +3,8 @@ export const nodeOps = {
     createElement: (tagName: string) => document.createElement(tagName),
     // 移除元素
     remove: (child: HTMLElement) => {
-        const parent = child.parentNode;
+        child.remove();
+        // const parent = child.parentNode;
     },
     // 插入元素
     insert: (child: HTMLElement, parent: HTMLElement, anchor: HTMLElement | null = null) => {
@@ -17,4 +18,6 @@ export const nodeOps = {
     createText: (text: string) => document.createTextNode(text),
     // 设置文本节点内容
     setText: (node: Text, text: string) => (node.nodeValue = text),
+    // 获取下一个节点
+    nextSibling: (node) => node.nextSibling,
 };

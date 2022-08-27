@@ -14,31 +14,24 @@
             const { createApp, h, reactive, effect } = VueRuntimeDom;
             const App = {
                 setup() {
-                    const user = reactive({
-                        nickname: 'Li',
-                        age: 22,
-                        sex: 0,
-                    });
+                    const data = reactive({ flag: true, text: '这是文本1' });
 
                     setTimeout(() => {
-                        user.name = 'wang';
+                        data.flag = false;
+                        data.text = '这是文本2';
                     }, 3000);
 
-                    effect(() => {
-                        console.log(user.sex);
-                    });
+                    // 元素标签发生变化
+                    // return () =>
+                    //     data.flag
+                    //         ? h('div', { style: { border: '1px solid red', padding: '5px 12px' } }, data.text)
+                    //         : h('span', { style: { border: '1px solid black', padding: '5px 12px' } }, data.text);
 
-                    const onClick = () => {
-                        user.nickname = 'wang';
-                        user.nickname = 'wang1';
-                        user.nickname = 'wang2';
-                        user.nickname = 'wang3';
-                        console.log('click trigger');
-                    };
-
-                    return () => {
-                        return h('div', { onClick }, user.nickname);
-                    };
+                    // 元素属性发生变化
+                    return () =>
+                        data.flag
+                            ? h('div', { style: { border: '1px solid red', padding: '5px 12px' } }, data.text)
+                            : h('div', { style: { border: '1px solid black', padding: '12px 5px' } }, data.text);
                 },
             };
             createApp(App, { key: 'a3ebf2' }).mount('#app');

@@ -3,11 +3,11 @@ import { ShapeFlags } from '@hw-vue/shared';
 import { createAppApi } from './apiCreateApp';
 import { createComponentInstance, setupComponent } from './component';
 import { queueJob } from './queueJob';
-import { normalizeVNode, TEXT } from './vnode';
+import { isSameVNode, normalizeVNode, TEXT } from './vnode';
 
 // 创建渲染器
 export function createRenderer(rendererOptions) {
-    const { insert, remove, createElement, createText, setText, setElementText, patchProp } = rendererOptions;
+    const { insert, remove, createElement, createText, setText, setElementText, patchProp, nextSibling } = rendererOptions;
 
     // 创建render effect函数
     const setupRenderEffect = (instance, container) => {
@@ -22,7 +22,10 @@ export function createRenderer(rendererOptions) {
                     instance.isMounted = true;
                 } else {
                     // 更新
-                    console.log('更新');
+                    const prevTree = instance.subTree;
+                    const newProxy = instance.proxy;
+                    const subTree = (instance.subTree = instance.render.call(newProxy, newProxy));
+                    patch(prevTree, subTree, container);
                 }
             },
             {
@@ -37,16 +40,29 @@ export function createRenderer(rendererOptions) {
         }
     }
 
-    const patch = (n1, n2, container) => {
+    function umount(node) {
+        remove(node.el);
+    }
+
+    const patch = (n1, n2, container, anchor?) => {
         // 不同类型，不同初始化流程
         const { shapeFlag, type } = n2;
+
+        // 判断n1, n2是否是同一节点，不是则没有必要进行patch, 只需要执行节点的卸载和刷新即可
+        if (n1 && n2 && !isSameVNode(n1, n2)) {
+            // 设置锚点，防止移除旧节点后，新节点因为没有锚点插入到当前节点层级末尾，改变了顺序
+            anchor = nextSibling(n1.el);
+            umount(n1);
+            n1 = null;
+        }
+
         switch (type) {
             case TEXT:
                 processText(n1, n2, container);
                 break;
             default:
                 if (shapeFlag & ShapeFlags.ELEMENT) {
-                    processElement(n1, n2, container);
+                    processElement(n1, n2, container, anchor);
                 } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
                     // 调用处理组件的逻辑
                     processComponent(n1, n2, container);
@@ -63,8 +79,7 @@ export function createRenderer(rendererOptions) {
         });
     }
 
-    function mountElement(vNode, container) {
-        console.log(container);
+    function mountElement(vNode, container, anchor?) {
         // 递归渲染
         const { props, shapeFlag, type, children } = vNode;
         // 创建元素
@@ -80,12 +95,49 @@ export function createRenderer(rendererOptions) {
             mountChildren(children, el);
         }
 
-        insert(el, container);
+        insert(el, container, anchor);
     }
 
-    function processElement(n1, n2, container) {
+    function patchProps(oldProps, newProps, el) {
+        if (oldProps !== newProps) {
+            // 遍历更新新属性
+            Object.keys(newProps).forEach((key) => {
+                if (newProps[key] !== oldProps[key]) {
+                    patchProp(el, key, oldProps[key], newProps[key]);
+                }
+            });
+            // 移除旧属性
+            Object.keys(oldProps).forEach((key) => {
+                if (newProps[key] === undefined) {
+                    patchProp(el, key, oldProps[key], null);
+                }
+            });
+        }
+    }
+
+    /**
+     * Element 节点diff
+     * @param n1
+     * @param n2
+     * @param container
+     */
+    function patchElement(n1, n2, container) {
+        // 因为元素节点相同，执行元素复用
+        const el = (n2.el = n1.el);
+
+        // 获取新旧props (这里的props指代传入h函数第二个参数 ex:{ onClick, style, value, class ...})
+        const oldProps = n1.props || {};
+        const newProps = n2.props || {};
+        // 比较props
+        patchProps(oldProps, newProps, el);
+    }
+
+    function processElement(n1, n2, container, anchor?) {
         if (!n1) {
-            mountElement(n2, container);
+            mountElement(n2, container, anchor);
+        } else {
+            // 进行节点diff
+            patchElement(n1, n2, container);
         }
     }
 
