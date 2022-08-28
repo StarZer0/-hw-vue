@@ -8,6 +8,7 @@ export function isVNode(node) {
 // case 1: h('div', { class: 'class-name' }, [childrens])
 // case 2: createVNode(component, props)
 export function createVNode(component, props, children = null) {
+    console.log('cvn', children);
     // 根据component的类型判断是普通元素还是组件
 
     const shapeFlag = isString(component) ? ShapeFlags.ELEMENT : isObject(component) ? ShapeFlags.STATEFUL_COMPONENT : 0;
@@ -29,7 +30,6 @@ export function createVNode(component, props, children = null) {
 }
 
 function normalizeChildren(vnode, children) {
-    console.log(children);
     let type = 0;
     if (children === null) {
         // 不需要做任何处理

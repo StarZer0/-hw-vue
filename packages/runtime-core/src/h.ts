@@ -20,7 +20,7 @@ export function h(type: any, propsOrChildren?: any, children?: any) {
     } else {
         if (l > 3) {
             children = Array.prototype.slice.call(arguments, 2);
-        } else {
+        } else if (l === 3 && isVNode(children)) {
             children = [children];
         }
 

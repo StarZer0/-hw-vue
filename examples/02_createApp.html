@@ -28,10 +28,16 @@
                     //         : h('span', { style: { border: '1px solid black', padding: '5px 12px' } }, data.text);
 
                     // 元素属性发生变化
+                    // return () =>
+                    //     data.flag
+                    //         ? h('div', { style: { border: '1px solid red', padding: '5px 12px' } }, data.text)
+                    //         : h('div', { style: { border: '1px solid black', padding: '12px 5px' } }, data.text);
+
+                    // 纯文本变化
                     return () =>
                         data.flag
                             ? h('div', { style: { border: '1px solid red', padding: '5px 12px' } }, data.text)
-                            : h('div', { style: { border: '1px solid black', padding: '12px 5px' } }, data.text);
+                            : h('div', { style: { border: '1px solid red', padding: '5px 12px' } }, data.text);
                 },
             };
             createApp(App, { key: 'a3ebf2' }).mount('#app');
