@@ -1,7 +1,8 @@
 import { effect } from '@hw-vue/reactivity';
 import { ShapeFlags } from '@hw-vue/shared';
 import { createAppApi } from './apiCreateApp';
-import { createComponentInstance, setupComponent } from './component';
+import { invokeArrayFns } from './apiLifecycle';
+import { createComponentInstance, LifecycleHooks, setupComponent } from './component';
 import { queueJob } from './queueJob';
 import { isSameVNode, normalizeVNode, TEXT } from './vnode';
 
@@ -14,18 +15,37 @@ export function createRenderer(rendererOptions) {
         // 创建effect 并调用render方法
         instance.update = effect(
             function componentEffect() {
-                console.log('render gegnx');
                 if (!instance.isMounted) {
+                    // 调用beforeMount生命周期钩子
+                    if (instance[LifecycleHooks.BEFORE_MOUNT]) {
+                        invokeArrayFns(instance[LifecycleHooks.BEFORE_MOUNT]);
+                    }
+
                     const subTree = (instance.subTree = instance.render.call(instance.proxy, instance.proxy));
                     console.log(subTree);
                     patch(null, subTree, container);
                     instance.isMounted = true;
+
+                    // 调用mounted生命周期钩子
+                    if (instance[LifecycleHooks.MOUNTED]) {
+                        invokeArrayFns(instance[LifecycleHooks.MOUNTED]);
+                    }
                 } else {
+                    // 调用beforeUpdate钩子
+                    if (instance[LifecycleHooks.BEFORE_UPDATE]) {
+                        invokeArrayFns(instance[LifecycleHooks.BEFORE_UPDATE]);
+                    }
+
                     // 更新
                     const prevTree = instance.subTree;
                     const newProxy = instance.proxy;
                     const subTree = (instance.subTree = instance.render.call(newProxy, newProxy));
                     patch(prevTree, subTree, container);
+
+                    // 调用updated钩子
+                    if (instance[LifecycleHooks.UPDATED]) {
+                        invokeArrayFns(instance[LifecycleHooks.UPDATED]);
+                    }
                 }
             },
             {
@@ -148,7 +168,6 @@ export function createRenderer(rendererOptions) {
             const n1 = c1[i];
             const n2 = c2[i];
 
-            shile;
             if (isSameVNode(n1, n2)) {
                 patch(n1, n2, container);
             } else {

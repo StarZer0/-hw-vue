@@ -1,6 +1,36 @@
-import { effect } from '@hw-vue/reactivity';
 import { isFunction, isObject, ShapeFlags } from '@hw-vue/shared';
 import { PublicInstanceProxyHandlers } from './componentPublicInstance';
+
+export const enum LifecycleHooks {
+    BEFORE_CREATE = 'bc',
+    CREATED = 'c',
+    BEFORE_MOUNT = 'bm',
+    MOUNTED = 'm',
+    BEFORE_UPDATE = 'bu',
+    UPDATED = 'u',
+    BEFORE_UNMOUNT = 'bum',
+    UNMOUNTED = 'um',
+    DEACTIVATED = 'da',
+    ACTIVATED = 'a',
+    RENDER_TRIGGERED = 'rtg',
+    RENDER_TRACKED = 'rtc',
+    ERROR_CAPTURED = 'ec',
+    SERVER_PREFETCH = 'sp',
+}
+
+export let currentInstance = null;
+
+export function getCurrentInstance() {
+    return currentInstance;
+}
+
+export function setCurrentInstance(instance) {
+    currentInstance = instance;
+}
+
+export function unsetCurrentInstance() {
+    currentInstance = null;
+}
 
 // 创建组件实例
 export function createComponentInstance(vnode) {
@@ -44,8 +74,14 @@ function setupStatefulCOmponent(instance) {
     let { setup } = Component;
 
     if (setup) {
+        // 设置当前组件实例 方面生命周期注册时调用
+        setCurrentInstance(instance);
+
         const setupContext = createContext(instance);
         const setupResult = setup(instance.props, setupContext);
+
+        // 当前setup调用完成后，需要移除当前实例
+        unsetCurrentInstance();
         handleSetupResult(instance, setupResult);
     } else {
         finishComponentSetup(instance);
